@@ -1,6 +1,10 @@
 package example;
-import com.pff.*;
-import java.util.*;
+import java.util.Vector;
+
+import com.pff.PSTException;
+import com.pff.PSTFile;
+import com.pff.PSTFolder;
+import com.pff.PSTMessage;
 
 public class Test {
 	public static void main(String[] args)

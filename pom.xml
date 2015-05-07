@@ -1,32 +1,33 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
 
-    <groupId>com.pff</groupId>
-    <artifactId>java-libpst</artifactId>
-    <packaging>jar</packaging>
+	<groupId>com.pff</groupId>
+	<artifactId>java-libjpst</artifactId>
+	<packaging>jar</packaging>
 
-    <name>java-libpst</name>
-    <version>0.8.1</version>
-    <description>A library to read PST files with java, without need for external libraries.</description>
-    <url>https://code.google.com/p/java-libpst/</url>
+	<name>java-libjpst</name>
+	<version>0.8.1</version>
+	<description>A library to read PST files with java, without need for external libraries. This fork also provides the option to generate a JMAP compatible message object that can be serialised using Jackson. </description>
+	<url>https://github.com/Redsift/java-libjpst</url>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
-    <scm>
-        <url>https://github.com/rjohnsondev/java-libpst/tags/java-libpst-0.8.1</url>
-        <connection>scm:https://github.com/rjohnsondev/java-libpst.git/tags/java-libpst-0.8.1</connection>
+	<scm>
+        <connection>scm:https://github.com/Redsift/java-libjpst/tags/java-libjpst-0.8.1</connection>
+        <url>https://github.com/Redsift/java-libjpst/tags/java-libjpst-0.8.1</url>
     </scm>
 
     <developers>
@@ -39,6 +40,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jackson-2-version>2.5.0</jackson-2-version>
     </properties>
 
     <dependencies>
@@ -48,6 +50,34 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+        
+        <!-- the core, which includes Streaming API, shared low-level abstractions (but NOT data-binding) -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+   			<artifactId>jackson-core</artifactId>
+   			<version>${jackson-2-version}</version>
+ 		</dependency>
+
+ 		<!-- Just the annotations; use this dependency if you want to attach annotations to classes without connecting them to the code. -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson-2-version}</version>
+		</dependency>
+
+		<!-- databinding; ObjectMapper, JsonNode and related classes are here -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson-2-version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.4</version>
+			<scope>provided</scope>
+		</dependency>
     </dependencies>
 
     <build>

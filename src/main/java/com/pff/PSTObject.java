@@ -256,14 +256,14 @@ public class PSTObject {
 	{
 		try {
 			if ( stringType == 0x1F ) {
-				return new String(data, "UTF-16LE");
+				return new String(data, "UTF-16LE").replace("\u0000", "");
 			}
 
 			if (codepage == null) {
-				return new String(data);
+				return new String(data).replace("\u0000", "");
 			} else {
 				codepage = codepage.toUpperCase();
-				return new String(data, codepage);
+				return new String(data, codepage).replace("\u0000", "");
 			}
 			/*
 			if (codepage == null || codepage.toUpperCase().equals("UTF-8") || codepage.toUpperCase().equals("UTF-7")) {

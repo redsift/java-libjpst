@@ -68,60 +68,70 @@ public class PSTActivity extends PSTMessage {
 	
 	/**
 	 * Type
+	 * @return String
 	 */
 	public String getLogType() {
 		return getStringItem(pstFile.getNameToIdMapItem(0x00008700, PSTFile.PSETID_Log));
 	}
 	/**
 	 * Start
+	 * @return Date
 	 */
 	public Date getLogStart() {
 		return getDateItem(pstFile.getNameToIdMapItem(0x00008706, PSTFile.PSETID_Log));
 	}
 	/**
 	 * Duration
+	 * @return int
 	 */
 	public int getLogDuration() {
 		return getIntItem(pstFile.getNameToIdMapItem(0x00008707, PSTFile.PSETID_Log));
 	}
 	/**
 	 * End
+	 * @return Date
 	 */
 	public Date getLogEnd() {
 		return getDateItem(pstFile.getNameToIdMapItem(0x00008708, PSTFile.PSETID_Log));
 	}
 	/**
 	 * LogFlags
+	 * @return int
 	 */
 	public int getLogFlags() {
 		return getIntItem(pstFile.getNameToIdMapItem(0x0000870c, PSTFile.PSETID_Log));
 	}
 	/**
 	 * DocPrinted
+	 * @return boolean
 	 */
 	public boolean isDocumentPrinted() {
 		return (getBooleanItem(pstFile.getNameToIdMapItem(0x0000870e, PSTFile.PSETID_Log)));
 	}
 	/**
 	 * DocSaved
+	 * @return boolean
 	 */
 	public boolean isDocumentSaved() {
 		return (getBooleanItem(pstFile.getNameToIdMapItem(0x0000870f, PSTFile.PSETID_Log)));
 	}
 	/**
 	 * DocRouted
+	 * @return boolean
 	 */
 	public boolean isDocumentRouted() {
 		return (getBooleanItem(pstFile.getNameToIdMapItem(0x00008710, PSTFile.PSETID_Log)));
 	}
 	/**
 	 * DocPosted
+	 * @return boolean
 	 */
 	public boolean isDocumentPosted() {
 		return (getBooleanItem(pstFile.getNameToIdMapItem(0x00008711, PSTFile.PSETID_Log)));
 	}
 	/**
 	 * Type Description
+	 * @return String
 	 */
 	public String getLogTypeDesc() {
 		return getStringItem(pstFile.getNameToIdMapItem(0x00008712, PSTFile.PSETID_Log));
