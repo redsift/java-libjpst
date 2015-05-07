@@ -50,7 +50,7 @@ public class TestJMAP {
 		if (folder.getContentCount() > 0) {
 			PSTMessage email = (PSTMessage) folder.getNextChild();
 			while (email != null) {
-				System.out.println("Processing: " + email.getSubject());
+				// System.out.println("Processing: " + email.getSubject());
 				ObjectMapper mapper = new ObjectMapper();
 
 				// TODO: remove indentation from production system
