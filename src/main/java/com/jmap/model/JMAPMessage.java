@@ -33,4 +33,5 @@ public class JMAPMessage {
 	@Getter private String htmlBody;
 	@Getter private List<JMAPAttachment> attachments;
 	@Getter private Map<String, JMAPMessage> attachedMessages;
+	@Getter private JMAPMessageExtensions extensions; 
 }
