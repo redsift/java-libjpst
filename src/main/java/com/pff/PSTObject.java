@@ -100,9 +100,10 @@ public class PSTObject {
 	
 	/**
 	 * for pre-population
-	 * @param theFile
-	 * @param folderIndexNode
-	 * @param table
+	 * @param theFile file name
+	 * @param folderIndexNode folder node
+	 * @param table table
+	 * @param localDescriptorItems the local descriptors
 	 */
 	protected PSTObject(PSTFile theFile, DescriptorIndexNode folderIndexNode, PSTTableBC table, HashMap<Integer, PSTDescriptorItem> localDescriptorItems) {
 		this.pstFile = theFile;
@@ -364,6 +365,7 @@ public class PSTObject {
 	
 	/**
 	 * get the display name
+	 * @return String
 	 */
 	public String getDisplayName() {
 		return this.getStringItem(0x3001);
@@ -371,30 +373,35 @@ public class PSTObject {
 	/**
 	 * Address type
 	 * Known values are SMTP, EX (Exchange) and UNKNOWN
+	 * @return String
 	 */
 	public String getAddrType() {
 		return this.getStringItem(0x3002);
 	}
 	/**
 	 * E-mail address
+	 * @return String
 	 */
 	public String getEmailAddress() {
 		return this.getStringItem(0x3003);
 	}
 	/**
 	 * Comment
+	 * @return String
 	 */
 	public String getComment() {
 		return this.getStringItem(0x3004);
 	}
 	/**
 	 * Creation time
+	 * @return Date
 	 */
 	public Date getCreationTime() {
 		return this.getDateItem(0x3007);
 	}
 	/**
 	 * Modification time
+	 * @return Date
 	 */
 	public Date getLastModificationTime() {
 		return this.getDateItem(0x3008);
@@ -428,7 +435,8 @@ public class PSTObject {
 	
 	/**
 	 * Output a number in a variety of formats for easier consumption
-	 * @param data
+	 * @param pref the prefix
+	 * @param number the number to print
 	 */
 	public static void printFormattedNumber(String pref, long number) {
 		System.out.print(pref);
@@ -445,8 +453,8 @@ public class PSTObject {
 
 	/**
 	 * Output a dump of data in hex format in the order it was read in
-	 * @param data
-	 * @param pretty
+	 * @param data the byte array to print
+	 * @param pretty whether to prettify the output
 	 */
 	public static void printHexFormatted(byte[] data, boolean pretty) {
 		printHexFormatted(data,pretty, new int[0]);
@@ -507,7 +515,7 @@ public class PSTObject {
 	
 	/**
 	 * decode a lump of data that has been encrypted with the compressible encryption
-	 * @param data
+	 * @param data the byte array to decode
 	 * @return decoded data
 	 */
 	protected static byte[] decode(byte[] data) {
@@ -541,7 +549,7 @@ public class PSTObject {
 	
 	/**
 	 * Utility function for converting little endian bytes into a usable java long
-	 * @param data
+	 * @param data the byte array to convert
 	 * @return long version of the data
 	 */
 	public static long convertLittleEndianBytesToLong(byte[] data) {
@@ -549,9 +557,9 @@ public class PSTObject {
 	}
 	/**
 	 * Utility function for converting little endian bytes into a usable java long
-	 * @param data
-	 * @param start
-	 * @param end
+	 * @param data the byte array to convert
+	 * @param start start index
+	 * @param end end index
 	 * @return long version of the data
 	 */
 	public static long convertLittleEndianBytesToLong(byte[] data, int start, int end) {
@@ -569,9 +577,9 @@ public class PSTObject {
 	
 	/**
 	 * Utility function for converting big endian bytes into a usable java long
-	 * @param data
-	 * @param start
-	 * @param end
+	 * @param data the byte array to convert
+	 * @param start the start index
+	 * @param end the end index
 	 * @return long version of the data
 	 */
 	public static long convertBigEndianBytesToLong(byte[] data, int start, int end) {
@@ -623,11 +631,11 @@ public class PSTObject {
 
 	/**
 	 * Detect and load a PST Object from a file with the specified descriptor index
-	 * @param theFile
-	 * @param descriptorIndex
+	 * @param theFile the file to load
+	 * @param descriptorIndex the descriptor index
 	 * @return PSTObject with that index
-	 * @throws IOException
-	 * @throws PSTException
+	 * @throws IOException read error
+	 * @throws PSTException file error
 	 */
 	public static PSTObject detectAndLoadPSTObject(PSTFile theFile, long descriptorIndex)
 		throws IOException, PSTException
@@ -637,11 +645,11 @@ public class PSTObject {
 
 	/**
 	 * Detect and load a PST Object from a file with the specified descriptor index
-	 * @param theFile
-	 * @param folderIndexNode
+	 * @param theFile the file to load
+	 * @param folderIndexNode the folder index
 	 * @return PSTObject with that index
-	 * @throws IOException
-	 * @throws PSTException
+	 * @throws IOException read error
+	 * @throws PSTException file error
 	 */
 	static PSTObject detectAndLoadPSTObject(PSTFile theFile, DescriptorIndexNode folderIndexNode)
 		throws IOException, PSTException

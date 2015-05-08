@@ -6,14 +6,18 @@ import java.util.Arrays;
 import java.util.Date;
 
 /**
- * Class to represent a decoded PidLidGlobalObjectId or PidLidCleanGlobalObjectId (for Meeting Exceptions)
- * See [MS-OXOCAL] https://msdn.microsoft.com/en-us/library/cc425490(v=exchg.80).aspx, sections 2.2.1.27(PidLidGlobalObjectId) & 2.2.1.28(PidLidCleanGlobalObjectId)
+ * Class to represent a decoded PidLidGlobalObjectId or
+ * PidLidCleanGlobalObjectId (for Meeting Exceptions) See MS-OXOCAL
+ * https://msdn.microsoft.com/en-us/library/cc425490(v=exchg.80).aspx, sections
+ * 2.2.1.27 (PidLidGlobalObjectId) and 2.2.1.28 (PidLidCleanGlobalObjectId)
  *
- * @author Nick Buller
- *         NOTE: Following MS Doc for variable names so are exactly the same as in MS-OXOCAL (not following Java conventions)
+ * @author Nick Buller NOTE: Following MS Doc for variable names so are exactly
+ *         the same as in MS-OXOCAL (not following Java conventions)
  */
 public class PSTGlobalObjectId {
-	final protected static byte[] ReferenceByteArrayID = {0x04, 0x00, 0x00, 0x00, (byte) 0x82, 0x00, (byte) 0xe0, 0x00, 0x74, (byte) 0xc5, (byte) 0xb7, 0x10, 0x1a, (byte) 0x82, (byte) 0xe0, 0x08};
+	final protected static byte[] ReferenceByteArrayID = { 0x04, 0x00, 0x00,
+			0x00, (byte) 0x82, 0x00, (byte) 0xe0, 0x00, 0x74, (byte) 0xc5,
+			(byte) 0xb7, 0x10, 0x1a, (byte) 0x82, (byte) 0xe0, 0x08 };
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
 	byte[] ByteArrayID = new byte[16];
@@ -33,13 +37,17 @@ public class PSTGlobalObjectId {
 			throw new AssertionError("pidDate is too short");
 		}
 
-		System.arraycopy(pidData, 0, ByteArrayID, 0, ReferenceByteArrayID.length);
+		System.arraycopy(pidData, 0, ByteArrayID, 0,
+				ReferenceByteArrayID.length);
 
 		if (!Arrays.equals(ByteArrayID, ReferenceByteArrayID)) {
 			throw new AssertionError("ByteArrayID is incorrect");
 		}
 
-		ByteBuffer buffer = ByteBuffer.wrap(pidData, ReferenceByteArrayID.length, pidData.length - ReferenceByteArrayID.length).order(ByteOrder.LITTLE_ENDIAN);
+		ByteBuffer buffer = ByteBuffer.wrap(pidData,
+				ReferenceByteArrayID.length,
+				pidData.length - ReferenceByteArrayID.length).order(
+				ByteOrder.LITTLE_ENDIAN);
 
 		YH = buffer.get();
 		YL = buffer.get();
@@ -52,7 +60,8 @@ public class PSTGlobalObjectId {
 		Size = buffer.getInt();
 
 		if (buffer.remaining() != Size) {
-			throw new AssertionError("Incorrect remaining date in buffer to extract data");
+			throw new AssertionError(
+					"Incorrect remaining date in buffer to extract data");
 		}
 
 		Data = new byte[buffer.remaining()];
@@ -110,12 +119,9 @@ public class PSTGlobalObjectId {
 	}
 
 	public String toString() {
-		return "Byte Array ID[" + bytesToHex(ByteArrayID) + "] " +
-			"Year [" + getYear() + "] " +
-			"Month[" + M + "] " +
-			"Day[" + D + "] CreationTime[" + CreationTime + "] " +
-			"X[" + X + "] " +
-			"Size[" + Size + "] " +
-			"Data[" + bytesToHex(Data) + "]";
+		return "Byte Array ID[" + bytesToHex(ByteArrayID) + "] " + "Year ["
+				+ getYear() + "] " + "Month[" + M + "] " + "Day[" + D
+				+ "] CreationTime[" + CreationTime + "] " + "X[" + X + "] "
+				+ "Size[" + Size + "] " + "Data[" + bytesToHex(Data) + "]";
 	}
 }

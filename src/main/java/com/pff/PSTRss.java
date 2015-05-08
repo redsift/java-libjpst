@@ -43,10 +43,10 @@ import java.util.HashMap;
 public class PSTRss extends PSTMessage {
 
 	/**
-	 * @param theFile
-	 * @param descriptorIndexNode
-	 * @throws PSTException
-	 * @throws IOException
+	 * @param theFile the PSTFile
+	 * @param descriptorIndexNode the descriptor index node
+	 * @throws PSTException file error
+	 * @throws IOException read error
 	 */
 	public PSTRss(PSTFile theFile, DescriptorIndexNode descriptorIndexNode)
 			throws PSTException, IOException {
@@ -54,10 +54,10 @@ public class PSTRss extends PSTMessage {
 	}
 
 	/**
-	 * @param theFile
-	 * @param folderIndexNode
-	 * @param table
-	 * @param localDescriptorItems
+	 * @param theFile the PSTFile
+	 * @param folderIndexNode the folder index
+	 * @param table the table
+	 * @param localDescriptorItems the local descriptors
 	 */
 	public PSTRss(PSTFile theFile, DescriptorIndexNode folderIndexNode,
 			PSTTableBC table,
@@ -67,42 +67,49 @@ public class PSTRss extends PSTMessage {
 	
 	/**
 	 * Channel
+	 * @return String
 	 */
 	public String getPostRssChannelLink() {
 		return getStringItem(pstFile.getNameToIdMapItem(0x00008900, PSTFile.PSETID_PostRss));
 	}
 	/**
 	 * Item link
+	 * @return String
 	 */
 	public String getPostRssItemLink() {
 		return getStringItem(pstFile.getNameToIdMapItem(0x00008901, PSTFile.PSETID_PostRss));
 	}
 	/**
 	 * Item hash Integer 32-bit signed
+	 * @return int
 	 */
 	public int getPostRssItemHash() {
 		return getIntItem(pstFile.getNameToIdMapItem(0x00008902, PSTFile.PSETID_PostRss));
 	}
 	/**
 	 * Item GUID
+	 * @return String
 	 */
 	public String getPostRssItemGuid() {
 		return getStringItem(pstFile.getNameToIdMapItem(0x00008903, PSTFile.PSETID_PostRss));
 	}
 	/**
 	 * Channel GUID
+	 * @return String
 	 */
 	public String getPostRssChannel() {
 		return getStringItem(pstFile.getNameToIdMapItem(0x00008904, PSTFile.PSETID_PostRss));
 	}
 	/**
 	 * Item XML
+	 * @return String
 	 */
 	public String getPostRssItemXml() {
 		return getStringItem(pstFile.getNameToIdMapItem(0x00008905, PSTFile.PSETID_PostRss));
 	}
 	/**
 	 * Subscription
+	 * @return String
 	 */
 	public String getPostRssSubscription() {
 		return getStringItem(pstFile.getNameToIdMapItem(0x00008906, PSTFile.PSETID_PostRss));

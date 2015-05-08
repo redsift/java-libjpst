@@ -44,10 +44,10 @@ import java.util.Date;
 public class PSTActivity extends PSTMessage {
 
 	/**
-	 * @param theFile
-	 * @param descriptorIndexNode
-	 * @throws PSTException
-	 * @throws IOException
+	 * @param theFile the PSTFile
+	 * @param descriptorIndexNode the node index
+	 * @throws PSTException file error
+	 * @throws IOException read error
 	 */
 	public PSTActivity(PSTFile theFile, DescriptorIndexNode descriptorIndexNode)
 			throws PSTException, IOException {
@@ -55,10 +55,10 @@ public class PSTActivity extends PSTMessage {
 	}
 
 	/**
-	 * @param theFile
-	 * @param folderIndexNode
-	 * @param table
-	 * @param localDescriptorItems
+	 * @param theFile the PSTFile
+	 * @param folderIndexNode the folder index
+	 * @param table the table 
+	 * @param localDescriptorItems the descriptor items Map
 	 */
 	public PSTActivity(PSTFile theFile, DescriptorIndexNode folderIndexNode,
 			PSTTableBC table,

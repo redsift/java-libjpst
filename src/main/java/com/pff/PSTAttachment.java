@@ -148,6 +148,7 @@ public class PSTAttachment extends PSTObject {
 	
 	/**
 	 * Attachment (short) filename ASCII or Unicode string
+	 * @return String
 	 */
 	public String getFilename() {
 		return this.getStringItem(0x3704);
@@ -162,55 +163,64 @@ public class PSTAttachment extends PSTObject {
 	public static final int ATTACHMENT_METHOD_OLE = 6;
 
 	/**
-	 * Attachment method Integer 32-bit signed 0 => None (No attachment) 1 => By value 2 => By reference 3 => By reference resolve 4 => By reference only 5 => Embedded message 6 => OLE
+	 * Attachment method Integer 32-bit signed 0 == None (No attachment) 1 == By value 2 == By reference 3 == By reference resolve 4 == By reference only 5 == Embedded message 6 == OLE
+	 * @return int
 	 */
 	public int getAttachMethod() {
 		return this.getIntItem(0x3705);
 	}
 	/**
 	 * Attachment size
+	 * @return int
 	 */
 	public int getAttachSize() {
 		return this.getIntItem(0x0e20);
 	}
 	/**
 	 * Attachment number
+	 * @return int
 	 */
 	public int getAttachNum() {
 		return this.getIntItem(0x0e21);
 	}
 	/**
 	 * Attachment long filename ASCII or Unicode string
+	 * @return String
 	 */
 	public String getLongFilename() {
 		return this.getStringItem(0x3707);
 	}
 	/**
 	 * Attachment (short) pathname ASCII or Unicode string
+	 * @return String
 	 */
 	public String getPathname() {
 		return this.getStringItem(0x3708);
 	}
 	/**
 	 * Attachment Position Integer 32-bit signed
+	 * @return String
 	 */
 	public int getRenderingPosition() {
 		return this.getIntItem(0x370b);
 	}
 	/**
 	 * Attachment long pathname ASCII or Unicode string
+	 * @return String
 	 */
 	public String getLongPathname() {
 		return this.getStringItem(0x370d);
 	}
 	/**
 	 * Attachment mime type ASCII or Unicode string
+	 * @return String
 	 */
 	public String getMimeTag() {
 		return this.getStringItem(0x370e);
 	}
 	/**
 	 * Attachment mime sequence
+	 * @return int
 	 */
 	public int getMimeSequence() {
 		return this.getIntItem(0x3710);
@@ -218,6 +228,7 @@ public class PSTAttachment extends PSTObject {
 
 	/**
 	 * Attachment Content ID
+	 * @return String
 	 */
 	public String getContentId() {
 		return this.getStringItem(0x3712);
@@ -225,6 +236,7 @@ public class PSTAttachment extends PSTObject {
 
 	/**
 	 * Attachment not available in HTML
+	 * @return boolean
 	 */
 	public boolean isAttachmentInvisibleInHtml() {
 		int actionFlag = this.getIntItem(0x3714);
@@ -232,6 +244,7 @@ public class PSTAttachment extends PSTObject {
 	}
 	/**
 	 * Attachment not available in RTF
+	 * @return boolean
 	 */
 	public boolean isAttachmentInvisibleInRTF() {
 		int actionFlag = this.getIntItem(0x3714);
@@ -239,6 +252,7 @@ public class PSTAttachment extends PSTObject {
 	}
 	/**
 	 * Attachment is MHTML REF
+	 * @return boolean
 	 */
 	public boolean isAttachmentMhtmlRef() {
 		int actionFlag = this.getIntItem(0x3714);
@@ -247,6 +261,7 @@ public class PSTAttachment extends PSTObject {
 
 	/**
 	 * Attachment content disposition
+	 * @return String
 	 */
 	public String getAttachmentContentDisposition() {
 		return this.getStringItem(0x3716);
