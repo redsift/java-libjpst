@@ -8,6 +8,7 @@ import java.util.Vector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jmap.converter.JMAPMessageConverter;
+import com.jmap.utils.JMAPFileUtils;
 import com.pff.PSTException;
 import com.pff.PSTFile;
 import com.pff.PSTFolder;
@@ -59,7 +60,7 @@ public class TestJMAP {
 						SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 				mapper.writeValue(
 						new File(OUTPUT_DIRECTORY
-								+ JMAPMessageConverter.sha256(email
+								+ JMAPFileUtils.sha256(email
 										.getInternetMessageId())),
 						JMAPMessageConverter.getJMAPMessageWithAttachments(
 								mboxName, email, folderPath, OUTPUT_DIRECTORY));

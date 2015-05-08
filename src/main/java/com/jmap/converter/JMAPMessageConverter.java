@@ -1,19 +1,15 @@
 package com.jmap.converter;
 
-import java.io.File;
-import java.io.InputStream;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-
 import com.jmap.model.JMAPAttachment;
 import com.jmap.model.JMAPEmailer;
 import com.jmap.model.JMAPMessage;
 import com.jmap.model.JMAPMessageExtensions;
+import com.jmap.utils.JMAPFileUtils;
 import com.pff.PSTAttachment;
 import com.pff.PSTMessage;
 import com.pff.PSTRecipient;
@@ -89,7 +85,7 @@ public class JMAPMessageConverter {
 					attachments.add(JMAPAttachment
 							.builder()
 							.id(new Integer(pa.getAttachNum()).toString())
-							.url(saveAttachment(msg.getInternetMessageId(),
+							.url(JMAPFileUtils.saveAttachment(msg.getInternetMessageId(),
 									pa.getAttachNum(), pa.getFileInputStream(), outputDirectory))
 							.type(pa.getMimeTag())
 							.name(pa.getDisplayName())
@@ -105,38 +101,4 @@ public class JMAPMessageConverter {
 		}
 		return attachments;
 	}
-
-	private static String saveAttachment(String mid, int aid, InputStream fis, String outputDirectory) {
-		String rPath = null;
-		try {
-			String hash = sha256(mid);
-			String fPath = outputDirectory + hash + "-att-" + aid;
-			FileUtils.copyInputStreamToFile(fis, new File(fPath));
-			rPath = fPath;
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-		return rPath;
-	}
-
-	// TODO: Move to some util class
-	public static String sha256(String base) {
-		try {
-			MessageDigest digest = MessageDigest.getInstance("SHA-256");
-			byte[] hash = digest.digest(base.getBytes("UTF-8"));
-			StringBuffer hexString = new StringBuffer();
-
-			for (int i = 0; i < hash.length; i++) {
-				String hex = Integer.toHexString(0xff & hash[i]);
-				if (hex.length() == 1)
-					hexString.append('0');
-				hexString.append(hex);
-			}
-
-			return hexString.toString();
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-
 }
