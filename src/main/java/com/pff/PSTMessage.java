@@ -38,11 +38,12 @@ import java.util.Date;
 import java.util.HashMap;
 
 /**
- * PST Message contains functions that are common across most MAPI objects.
- * Note that many of these functions may not be applicable for the item in question,
- * however there seems to be no hard and fast outline for what properties apply to which
- * objects.  For properties where no value is set, a blank value is returned (rather than
- * an exception being raised).
+ * PST Message contains functions that are common across most MAPI objects. Note
+ * that many of these functions may not be applicable for the item in question,
+ * however there seems to be no hard and fast outline for what properties apply
+ * to which objects. For properties where no value is set, a blank value is
+ * returned (rather than an exception being raised).
+ * 
  * @author Richard Johnson
  */
 public class PSTMessage extends PSTObject {
@@ -52,22 +53,19 @@ public class PSTMessage extends PSTObject {
 	public static final int IMPORTANCE_HIGH = 2;
 
 	PSTMessage(PSTFile theFile, DescriptorIndexNode descriptorIndexNode)
-			throws PSTException, IOException
-	{
+			throws PSTException, IOException {
 		super(theFile, descriptorIndexNode);
 	}
 
-	PSTMessage(PSTFile theFile, DescriptorIndexNode folderIndexNode, PSTTableBC table, HashMap<Integer, PSTDescriptorItem> localDescriptorItems)
-	{
+	PSTMessage(PSTFile theFile, DescriptorIndexNode folderIndexNode,
+			PSTTableBC table,
+			HashMap<Integer, PSTDescriptorItem> localDescriptorItems) {
 		super(theFile, folderIndexNode, table, localDescriptorItems);
 	}
-	
-	public String getRTFBody()
-		throws PSTException, IOException
-	{
+
+	public String getRTFBody() throws PSTException, IOException {
 		// do we have an entry for it?
-		if (this.items.containsKey(0x1009))
-		{
+		if (this.items.containsKey(0x1009)) {
 			// is it a reference?
 			PSTTableBCItem item = this.items.get(0x1009);
 			if (item.data.length > 0) {
@@ -75,51 +73,50 @@ public class PSTMessage extends PSTObject {
 			}
 			int ref = item.entryValueReference;
 			PSTDescriptorItem descItem = this.localDescriptorItems.get(ref);
-			if ( descItem != null ) {
+			if (descItem != null) {
 				return LZFu.decode(descItem.getData());
 			}
 		}
-		
+
 		return "";
 	}
-	
-	
-	
+
 	/**
 	 * get the importance of the email
+	 * 
 	 * @return IMPORTANCE_NORMAL if unknown
 	 */
 	public int getImportance() {
 		return getIntItem(0x0017, IMPORTANCE_NORMAL);
 	}
-	
+
 	/**
 	 * get the message class for the email
+	 * 
 	 * @return empty string if unknown
 	 */
 	public String getMessageClass() {
 		return this.getStringItem(0x001a);
 	}
-	
+
 	/**
 	 * get the subject
+	 * 
 	 * @return empty string if not found
 	 */
 	public String getSubject() {
 		String subject = this.getStringItem(0x0037);
 
-//		byte[] controlCodesA = {0x01, 0x01};
-//		byte[] controlCodesB = {0x01, 0x05};
-//		byte[] controlCodesC = {0x01, 0x10};
-		if ( subject != null &&
-			 (subject.length() >= 2) &&
+		// byte[] controlCodesA = {0x01, 0x01};
+		// byte[] controlCodesB = {0x01, 0x05};
+		// byte[] controlCodesC = {0x01, 0x10};
+		if (subject != null && (subject.length() >= 2) &&
 
-//			 (subject.startsWith(new String(controlCodesA)) ||
-//			  subject.startsWith(new String(controlCodesB)) ||
-//			  subject.startsWith(new String(controlCodesC)))
-			  subject.charAt(0) == 0x01 )
-		{
-			if ( subject.length() == 2 ) {
+		// (subject.startsWith(new String(controlCodesA)) ||
+		// subject.startsWith(new String(controlCodesB)) ||
+		// subject.startsWith(new String(controlCodesC)))
+				subject.charAt(0) == 0x01) {
+			if (subject.length() == 2) {
 				subject = "";
 			} else {
 				subject = subject.substring(2, subject.length());
@@ -127,34 +124,38 @@ public class PSTMessage extends PSTObject {
 		}
 		return subject;
 	}
-	
+
 	/**
 	 * get the client submit time
+	 * 
 	 * @return null if not found
 	 */
 	public Date getClientSubmitTime() {
 		return this.getDateItem(0x0039);
 	}
-	
+
 	/**
 	 * get received by name
+	 * 
 	 * @return empty string if not found
 	 */
 	public String getReceivedByName() {
 		return this.getStringItem(0x0040);
 	}
-	
+
 	/**
 	 * get sent representing name
+	 * 
 	 * @return empty string if not found
 	 */
 	public String getSentRepresentingName() {
 		return this.getStringItem(0x0042);
 	}
-	
+
 	/**
-	 * Sent representing address type
-	 * Known values are SMTP, EX (Exchange) and UNKNOWN
+	 * Sent representing address type Known values are SMTP, EX (Exchange) and
+	 * UNKNOWN
+	 * 
 	 * @return empty string if not found
 	 */
 	public String getSentRepresentingAddressType() {
@@ -163,15 +164,17 @@ public class PSTMessage extends PSTObject {
 
 	/**
 	 * Sent representing email address
+	 * 
 	 * @return empty string if not found
 	 */
 	public String getSentRepresentingEmailAddress() {
 		return this.getStringItem(0x0065);
 	}
-	
+
 	/**
-	 * Conversation topic
-	 * This is basically the subject from which Fwd:, Re, etc. has been removed
+	 * Conversation topic This is basically the subject from which Fwd:, Re,
+	 * etc. has been removed
+	 * 
 	 * @return empty string if not found
 	 */
 	public String getConversationTopic() {
@@ -179,208 +182,266 @@ public class PSTMessage extends PSTObject {
 	}
 
 	/**
-	 * Received by address type
-	 * Known values are SMTP, EX (Exchange) and UNKNOWN
+	 * Received by address type Known values are SMTP, EX (Exchange) and UNKNOWN
+	 * 
 	 * @return empty string if not found
 	 */
 	public String getReceivedByAddressType() {
 		return this.getStringItem(0x0075);
 	}
-	
+
 	/**
 	 * Received by email address
+	 * 
 	 * @return empty string if not found
 	 */
 	public String getReceivedByAddress() {
 		return this.getStringItem(0x0076);
 	}
-	
+
 	/**
-	 * Transport message headers ASCII or Unicode string These contain the SMTP e-mail headers.
+	 * Transport message headers ASCII or Unicode string These contain the SMTP
+	 * e-mail headers.
+	 * 
 	 * @return String
 	 */
 	public String getTransportMessageHeaders() {
 		return this.getStringItem(0x007d);
 	}
-	
 
 	public boolean isRead() {
 		return ((this.getIntItem(0x0e07) & 0x01) != 0);
 	}
+
 	public boolean isUnmodified() {
 		return ((this.getIntItem(0x0e07) & 0x02) != 0);
 	}
+
 	public boolean isSubmitted() {
 		return ((this.getIntItem(0x0e07) & 0x04) != 0);
 	}
+
 	public boolean isUnsent() {
 		return ((this.getIntItem(0x0e07) & 0x08) != 0);
 	}
+
 	public boolean hasAttachments() {
 		return ((this.getIntItem(0x0e07) & 0x10) != 0);
 	}
+
 	public boolean isFromMe() {
 		return ((this.getIntItem(0x0e07) & 0x20) != 0);
 	}
+
 	public boolean isAssociated() {
 		return ((this.getIntItem(0x0e07) & 0x40) != 0);
 	}
+
 	public boolean isResent() {
 		return ((this.getIntItem(0x0e07) & 0x80) != 0);
 	}
-	
-	
+
 	/**
 	 * Acknowledgment mode Integer 32-bit signed
+	 * 
 	 * @return int
 	 */
-	public int getAcknowledgementMode () {
+	public int getAcknowledgementMode() {
 		return this.getIntItem(0x0001);
 	}
+
 	/**
-	 * Originator delivery report requested set if the sender wants a delivery report from all recipients 0 = false 0 != true
+	 * Originator delivery report requested set if the sender wants a delivery
+	 * report from all recipients 0 = false 0 != true
+	 * 
 	 * @return boolean
 	 */
-	public boolean getOriginatorDeliveryReportRequested () {
+	public boolean getOriginatorDeliveryReportRequested() {
 		return (this.getIntItem(0x0023) != 0);
 	}
-	// 0x0025 	0x0102 	PR_PARENT_KEY 	Parent key Binary data Contains a GUID
+
+	// 0x0025 0x0102 PR_PARENT_KEY Parent key Binary data Contains a GUID
 	/**
 	 * Priority Integer 32-bit signed -1 = NonUrgent 0 = Normal 1 = Urgent
+	 * 
 	 * @return int
 	 */
-	public int getPriority () {
+	public int getPriority() {
 		return this.getIntItem(0x0026);
 	}
+
 	/**
 	 * Read Receipt Requested Boolean 0 = false 0 != true
+	 * 
 	 * @return boolean
 	 */
-	public boolean getReadReceiptRequested () {
+	public boolean getReadReceiptRequested() {
 		return (this.getIntItem(0x0029) != 0);
 	}
+
 	/**
 	 * Recipient Reassignment Prohibited Boolean 0 = false 0 != true
+	 * 
 	 * @return boolean
 	 */
-	public boolean getRecipientReassignmentProhibited () {
+	public boolean getRecipientReassignmentProhibited() {
 		return (this.getIntItem(0x002b) != 0);
 	}
+
 	/**
-	 * Original sensitivity Integer 32-bit signed the sensitivity of the message before being replied to or forwarded 0 = None 1 = Personal 2 = Private 3 = Company Confidential
+	 * Original sensitivity Integer 32-bit signed the sensitivity of the message
+	 * before being replied to or forwarded 0 = None 1 = Personal 2 = Private 3
+	 * = Company Confidential
+	 * 
 	 * @return int
 	 */
-	public int getOriginalSensitivity () {
+	public int getOriginalSensitivity() {
 		return this.getIntItem(0x002e);
 	}
+
 	/**
-	 * Sensitivity Integer 32-bit signed sender's opinion of the sensitivity of an email 0 = None 1 = Personal 2 = Private 3 = Company Confidential
+	 * Sensitivity Integer 32-bit signed sender's opinion of the sensitivity of
+	 * an email 0 = None 1 = Personal 2 = Private 3 = Company Confidential
+	 * 
 	 * @return int
 	 */
-	public int getSensitivity () {
+	public int getSensitivity() {
 		return this.getIntItem(0x0036);
 	}
-	//0x003f 	0x0102 	PR_RECEIVED_BY_ENTRYID (PidTagReceivedByEntr yId) 	Received by entry identifier Binary data Contains recipient/sender structure
-	//0x0041 	0x0102 	PR_SENT_REPRESENTING_ENTRYID 	Sent representing entry identifier Binary data Contains recipient/sender structure
-	//0x0043 	0x0102 	PR_RCVD_REPRESENTING_ENTRYID 	Received representing entry identifier Binary data Contains recipient/sender structure
-	
+
+	// 0x003f 0x0102 PR_RECEIVED_BY_ENTRYID (PidTagReceivedByEntr yId) Received
+	// by entry identifier Binary data Contains recipient/sender structure
+	// 0x0041 0x0102 PR_SENT_REPRESENTING_ENTRYID Sent representing entry
+	// identifier Binary data Contains recipient/sender structure
+	// 0x0043 0x0102 PR_RCVD_REPRESENTING_ENTRYID Received representing entry
+	// identifier Binary data Contains recipient/sender structure
+
 	/**
 	 * Address book search key
+	 * 
 	 * @return byte[]
 	 */
-	public byte[] getPidTagSentRepresentingSearchKey()
-	{
+	public byte[] getPidTagSentRepresentingSearchKey() {
 		return this.getBinaryItem(0x003b);
 	}
+
 	/**
 	 * Received representing name ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
-	public String getRcvdRepresentingName () {
+	public String getRcvdRepresentingName() {
 		return this.getStringItem(0x0044);
 	}
+
 	/**
 	 * Original subject ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
-	public String getOriginalSubject () {
+	public String getOriginalSubject() {
 		return this.getStringItem(0x0049);
 	}
-//	0x004e 	0x0040 	PR_ORIGINAL_SUBMIT_TIME 	Original submit time Filetime
+
+	// 0x004e 0x0040 PR_ORIGINAL_SUBMIT_TIME Original submit time Filetime
 	/**
 	 * Reply recipients names ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
-	public String getReplyRecipientNames () {
+	public String getReplyRecipientNames() {
 		return this.getStringItem(0x0050);
 	}
+
 	/**
 	 * My address in To field Boolean
+	 * 
 	 * @return boolean
 	 */
-	public boolean getMessageToMe () {
+	public boolean getMessageToMe() {
 		return (this.getIntItem(0x0057) != 0);
 	}
+
 	/**
 	 * My address in CC field Boolean
+	 * 
 	 * @return boolean
 	 */
-	public boolean getMessageCcMe () {
+	public boolean getMessageCcMe() {
 		return (this.getIntItem(0x0058) != 0);
 	}
+
 	/**
-	 * Indicates that the receiving mailbox owner is a primary or a carbon copy (Cc) recipient
+	 * Indicates that the receiving mailbox owner is a primary or a carbon copy
+	 * (Cc) recipient
+	 * 
 	 * @return boolean
 	 */
-	public boolean getMessageRecipMe () {
+	public boolean getMessageRecipMe() {
 		return this.getIntItem(0x0059) != 0;
 	}
+
 	/**
 	 * Response requested Boolean
+	 * 
 	 * @return boolean
 	 */
-	public boolean getResponseRequested () {
+	public boolean getResponseRequested() {
 		return getBooleanItem(0x0063);
 	}
+
 	/**
-	 * Sent representing address type ASCII or Unicode string Known values are SMTP, EX (Exchange) and UNKNOWN
+	 * Sent representing address type ASCII or Unicode string Known values are
+	 * SMTP, EX (Exchange) and UNKNOWN
+	 * 
 	 * @return String
 	 */
-	public String getSentRepresentingAddrtype () {
+	public String getSentRepresentingAddrtype() {
 		return this.getStringItem(0x0064);
 	}
-	//0x0071 	0x0102 	PR_CONVERSATION_INDEX (PidTagConversationInd ex) 	Conversation index Binary data
+
+	// 0x0071 0x0102 PR_CONVERSATION_INDEX (PidTagConversationInd ex)
+	// Conversation index Binary data
 	/**
 	 * Original display BCC ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
-	public String getOriginalDisplayBcc () {
+	public String getOriginalDisplayBcc() {
 		return this.getStringItem(0x0072);
 	}
+
 	/**
 	 * Original display CC ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
-	public String getOriginalDisplayCc () {
+	public String getOriginalDisplayCc() {
 		return this.getStringItem(0x0073);
 	}
+
 	/**
 	 * Original display TO ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
-	public String getOriginalDisplayTo () {
+	public String getOriginalDisplayTo() {
 		return this.getStringItem(0x0074);
 	}
+
 	/**
-	 * Received representing address type.
-	 * Known values are SMTP, EX (Exchange) and UNKNOWN
+	 * Received representing address type. Known values are SMTP, EX (Exchange)
+	 * and UNKNOWN
+	 * 
 	 * @return String
 	 */
-	public String getRcvdRepresentingAddrtype () {
+	public String getRcvdRepresentingAddrtype() {
 		return this.getStringItem(0x0077);
 	}
+
 	/**
 	 * Received representing e-mail address
+	 * 
 	 * @return String
 	 */
 	public String getRcvdRepresentingEmailAddress() {
@@ -390,9 +451,10 @@ public class PSTMessage extends PSTObject {
 	/**
 	 * Recipient details
 	 */
-	
+
 	/**
 	 * Non receipt notification requested
+	 * 
 	 * @return boolean
 	 */
 	public boolean isNonReceiptNotificationRequested() {
@@ -401,6 +463,7 @@ public class PSTMessage extends PSTObject {
 
 	/**
 	 * Originator non delivery report requested
+	 * 
 	 * @return boolean
 	 */
 	public boolean isOriginatorNonDeliveryReportRequested() {
@@ -409,42 +472,46 @@ public class PSTMessage extends PSTObject {
 
 	public static final int RECIPIENT_TYPE_TO = 1;
 	public static final int RECIPIENT_TYPE_CC = 2;
-	
+
 	/**
 	 * Recipient type Integer 32-bit signed 0x01 == To 0x02 == CC
+	 * 
 	 * @return int
 	 */
 	public int getRecipientType() {
 		return this.getIntItem(0x0c15);
 	}
-	
+
 	/**
 	 * Reply requested
+	 * 
 	 * @return boolean
 	 */
 	public boolean isReplyRequested() {
 		return (this.getIntItem(0x0c17) != 0);
 	}
-	
+
 	/**
 	 * Sending mailbox owner's address book entry ID
+	 * 
 	 * @return boolean
 	 */
 	public byte[] getSenderEntryId() {
 		return this.getBinaryItem(0x0c19);
 	}
-	
+
 	/**
 	 * Sender name
+	 * 
 	 * @return String
 	 */
 	public String getSenderName() {
 		return this.getStringItem(0x0c1a);
 	}
-	
+
 	/**
-	 * Sender address type.
-	 * Known values are SMTP, EX (Exchange) and UNKNOWN
+	 * Sender address type. Known values are SMTP, EX (Exchange) and UNKNOWN
+	 * 
 	 * @return String
 	 */
 	public String getSenderAddrtype() {
@@ -453,33 +520,38 @@ public class PSTMessage extends PSTObject {
 
 	/**
 	 * Sender e-mail address
+	 * 
 	 * @return String
 	 */
 	public String getSenderEmailAddress() {
 		return this.getStringItem(0x0c1f);
 	}
-	
+
 	/**
 	 * Non-transmittable message properties
 	 */
 
 	/**
 	 * Message size
+	 * 
 	 * @return long
 	 */
 	public long getMessageSize() {
 		return this.getLongItem(0x0e08);
 	}
+
 	/**
 	 * Internet article number
+	 * 
 	 * @return int
 	 */
 	public int getInternetArticleNumber() {
 		return this.getIntItem(0x0e23);
 	}
-	
+
 	/**
 	 * Server that the client should attempt to send the mail with
+	 * 
 	 * @return String
 	 */
 	public String getPrimarySendAccount() {
@@ -488,6 +560,7 @@ public class PSTMessage extends PSTObject {
 
 	/**
 	 * Server that the client is currently using to send mail
+	 * 
 	 * @return String
 	 */
 	public String getNextSendAcct() {
@@ -496,149 +569,172 @@ public class PSTMessage extends PSTObject {
 
 	/**
 	 * URL computer name postfix
+	 * 
 	 * @return int
 	 */
 	public int getURLCompNamePostfix() {
 		return this.getIntItem(0x0e61);
 	}
+
 	/**
 	 * Object type
+	 * 
 	 * @return int
 	 */
 	public int getObjectType() {
 		return this.getIntItem(0x0ffe);
 	}
+
 	/**
 	 * Delete after submit
+	 * 
 	 * @return boolean
 	 */
 	public boolean getDeleteAfterSubmit() {
 		return ((this.getIntItem(0x0e01)) != 0);
 	}
+
 	/**
 	 * Responsibility
+	 * 
 	 * @return boolean
 	 */
 	public boolean getResponsibility() {
 		return ((this.getIntItem(0x0e0f)) != 0);
 	}
+
 	/**
 	 * Compressed RTF in Sync Boolean
+	 * 
 	 * @return boolean
 	 */
 	public boolean isRTFInSync() {
 		return ((this.getIntItem(0x0e1f)) != 0);
 	}
+
 	/**
 	 * URL computer name set
+	 * 
 	 * @return boolean
 	 */
 	public boolean isURLCompNameSet() {
 		return ((this.getIntItem(0x0e62)) != 0);
 	}
+
 	/**
 	 * Display BCC
+	 * 
 	 * @return String
 	 */
 	public String getDisplayBCC() {
 		return this.getStringItem(0x0e02);
 	}
+
 	/**
 	 * Display CC
+	 * 
 	 * @return String
 	 */
 	public String getDisplayCC() {
 		return this.getStringItem(0x0e03);
 	}
+
 	/**
 	 * Display To
+	 * 
 	 * @return String
 	 */
 	public String getDisplayTo() {
 		return this.getStringItem(0x0e04);
 	}
+
 	/**
 	 * Message delivery time
+	 * 
 	 * @return Date
 	 */
 	public Date getMessageDeliveryTime() {
 		return this.getDateItem(0x0e06);
 	}
-	
-//	
-//	public int getFlags() {
-//		if (this.items.containsKey(0x0e17)) {
-//			System.out.println(this.items.get(0x0e17));
-//		}
-//		return this.getIntItem(0x0e17);
-//	}
-//	
-//	/**
-//	 * The message is to be highlighted in recipients' folder displays.
-//	 */
-//	public boolean isHighlighted() {
-//		return (this.getIntItem(0x0e17) & 0x1) != 0;
-//	}
-//
-//	/**
-//	 * The message has been tagged for a client-defined purpose.
-//	 */
-//	public boolean isTagged() {
-//		return (this.getIntItem(0x0e17) & 0x2) != 0;
-//	}
-//
-//	/**
-//	 * The message is to be suppressed from recipients' folder displays.
-//	 */
-//	public boolean isHidden() {
-//		return (this.getIntItem(0x0e17) & 0x4) != 0;
-//	}
-//
-//	/**
-//	 * The message has been marked for subsequent deletion
-//	 */
-//	public boolean isDelMarked() {
-//		return (this.getIntItem(0x0e17) & 0x8) != 0;
-//	}
-//
-//	/**
-//	 * The message is in draft revision status.
-//	 */
-//	public boolean isDraft() {
-//		return (this.getIntItem(0x0e17) & 0x100) != 0;
-//	}
-//
-//	/**
-//	 * The message has been replied to.
-//	 */
-//	public boolean isAnswered() {
-//		return (this.getIntItem(0x0e17) & 0x200) != 0;
-//	}
-//
-//	/**
-//	 * The message has been marked for downloading from the remote message store to the local client
-//	 */
-//	public boolean isMarkedForDownload() {
-//		return (this.getIntItem(0x0e17) & 0x1000) != 0;
-//	}
-//
-//	/**
-//	 * The message has been marked for deletion at the remote message store without downloading to the local client.
-//	 */
-//	public boolean isRemoteDelMarked() {
-//		return (this.getIntItem(0x0e17) & 0x2000) != 0;
-//	}
-	
+
+	//
+	// public int getFlags() {
+	// if (this.items.containsKey(0x0e17)) {
+	// System.out.println(this.items.get(0x0e17));
+	// }
+	// return this.getIntItem(0x0e17);
+	// }
+	//
+	// /**
+	// * The message is to be highlighted in recipients' folder displays.
+	// */
+	// public boolean isHighlighted() {
+	// return (this.getIntItem(0x0e17) & 0x1) != 0;
+	// }
+	//
+	// /**
+	// * The message has been tagged for a client-defined purpose.
+	// */
+	// public boolean isTagged() {
+	// return (this.getIntItem(0x0e17) & 0x2) != 0;
+	// }
+	//
+	// /**
+	// * The message is to be suppressed from recipients' folder displays.
+	// */
+	// public boolean isHidden() {
+	// return (this.getIntItem(0x0e17) & 0x4) != 0;
+	// }
+	//
+	// /**
+	// * The message has been marked for subsequent deletion
+	// */
+	// public boolean isDelMarked() {
+	// return (this.getIntItem(0x0e17) & 0x8) != 0;
+	// }
+	//
+	// /**
+	// * The message is in draft revision status.
+	// */
+	// public boolean isDraft() {
+	// return (this.getIntItem(0x0e17) & 0x100) != 0;
+	// }
+	//
+	// /**
+	// * The message has been replied to.
+	// */
+	// public boolean isAnswered() {
+	// return (this.getIntItem(0x0e17) & 0x200) != 0;
+	// }
+	//
+	// /**
+	// * The message has been marked for downloading from the remote message
+	// store to the local client
+	// */
+	// public boolean isMarkedForDownload() {
+	// return (this.getIntItem(0x0e17) & 0x1000) != 0;
+	// }
+	//
+	// /**
+	// * The message has been marked for deletion at the remote message store
+	// without downloading to the local client.
+	// */
+	// public boolean isRemoteDelMarked() {
+	// return (this.getIntItem(0x0e17) & 0x2000) != 0;
+	// }
+
 	/**
 	 * Message content properties
+	 * 
 	 * @return int
 	 */
 	public int getNativeBodyType() {
 		return this.getIntItem(0x1016);
 	}
-	
+
 	/**
 	 * Plain text e-mail body
+	 * 
 	 * @return String
 	 */
 	public String getBody() {
@@ -652,49 +748,62 @@ public class PSTMessage extends PSTObject {
 		}
 		return this.getStringItem(0x1000, 0, cp);
 	}
+
 	/*
 	 * Plain text body prefix
 	 */
 	public String getBodyPrefix() {
 		return this.getStringItem(0x6619);
 	}
+
 	/**
 	 * RTF Sync Body CRC
+	 * 
 	 * @return int
 	 */
 	public int getRTFSyncBodyCRC() {
 		return this.getIntItem(0x1006);
 	}
+
 	/**
 	 * RTF Sync Body character count
+	 * 
 	 * @return int
 	 */
 	public int getRTFSyncBodyCount() {
 		return this.getIntItem(0x1007);
 	}
+
 	/**
 	 * RTF Sync body tag
+	 * 
 	 * @return String
 	 */
 	public String getRTFSyncBodyTag() {
 		return this.getStringItem(0x1008);
 	}
+
 	/**
 	 * RTF whitespace prefix count
+	 * 
 	 * @return int
 	 */
 	public int getRTFSyncPrefixCount() {
 		return this.getIntItem(0x1010);
 	}
+
 	/**
 	 * RTF whitespace tailing count
+	 * 
 	 * @return int
 	 */
 	public int getRTFSyncTrailingCount() {
 		return this.getIntItem(0x1011);
 	}
+
 	/**
 	 * HTML e-mail body
+	 * 
 	 * @return String
 	 */
 	public String getBodyHTML() {
@@ -711,212 +820,246 @@ public class PSTMessage extends PSTObject {
 
 	/**
 	 * Message ID for this email as allocated per rfc2822
+	 * 
 	 * @return String
 	 */
 	public String getInternetMessageId() {
 		return this.getStringItem(0x1035);
 	}
+
 	/**
 	 * In-Reply-To
+	 * 
 	 * @return String
 	 */
 	public String getInReplyToId() {
 		return this.getStringItem(0x1042);
 	}
+
 	/**
 	 * Return Path
+	 * 
 	 * @return String
 	 */
 	public String getReturnPath() {
 		return this.getStringItem(0x1046);
 	}
+
 	/**
 	 * Icon index
+	 * 
 	 * @return int
 	 */
 	public int getIconIndex() {
 		return this.getIntItem(0x1080);
 	}
-	
+
 	/**
-	 * Action flag
-	 * This relates to the replying / forwarding of messages.
-	 * It is classified as "unknown" atm, so just provided here
-	 * in case someone works out what all the various flags mean.
+	 * Action flag This relates to the replying / forwarding of messages. It is
+	 * classified as "unknown" atm, so just provided here in case someone works
+	 * out what all the various flags mean.
+	 * 
 	 * @return int
 	 */
 	public int getActionFlag() {
 		return this.getIntItem(0x1081);
 	}
+
 	/**
 	 * is the action flag for this item "forward"?
+	 * 
 	 * @return boolean
 	 */
 	public boolean hasForwarded() {
 		int actionFlag = this.getIntItem(0x1081);
 		return ((actionFlag & 0x8) > 0);
 	}
+
 	/**
-	 * is the action flag for this item "replied"? 
+	 * is the action flag for this item "replied"?
+	 * 
 	 * @return boolean
 	 */
 	public boolean hasReplied() {
 		int actionFlag = this.getIntItem(0x1081);
 		return ((actionFlag & 0x4) > 0);
 	}
+
 	/**
-	 * the date that this item had an action performed (eg. replied or forwarded)
+	 * the date that this item had an action performed (eg. replied or
+	 * forwarded)
+	 * 
 	 * @return Date
 	 */
 	public Date getActionDate() {
 		return this.getDateItem(0x1082);
 	}
-	
+
 	/**
 	 * Disable full fidelity
+	 * 
 	 * @return boolean
 	 */
 	public boolean getDisableFullFidelity() {
 		return (this.getIntItem(0x10f2) != 0);
 	}
+
 	/**
-	 * URL computer name
-	 * Contains the .eml file name
+	 * URL computer name Contains the .eml file name
+	 * 
 	 * @return String
 	 */
 	public String getURLCompName() {
 		return this.getStringItem(0x10f3);
 	}
+
 	/**
 	 * Attribute hidden
+	 * 
 	 * @return boolean
 	 */
 	public boolean getAttrHidden() {
 		return (this.getIntItem(0x10f4) != 0);
 	}
+
 	/**
 	 * Attribute system
+	 * 
 	 * @return boolean
 	 */
 	public boolean getAttrSystem() {
 		return (this.getIntItem(0x10f5) != 0);
 	}
+
 	/**
 	 * Attribute read only
+	 * 
 	 * @return boolean
 	 */
 	public boolean getAttrReadonly() {
 		return (this.getIntItem(0x10f6) != 0);
 	}
 
-	
 	private PSTTable7C recipientTable = null;
+
 	/**
-	 * find, extract and load up all of the attachments in this email
-	 * necessary for the other operations.
+	 * find, extract and load up all of the attachments in this email necessary
+	 * for the other operations.
+	 * 
 	 * @throws PSTException
 	 * @throws IOException
 	 */
-	private void processRecipients()
-	{
+	private void processRecipients() {
 		try {
 			int recipientTableKey = 0x0692;
-			if (this.recipientTable == null &&
-				this.localDescriptorItems != null &&
-				this.localDescriptorItems.containsKey(recipientTableKey))
-			{
-				PSTDescriptorItem item = this.localDescriptorItems.get(recipientTableKey);
+			if (this.recipientTable == null
+					&& this.localDescriptorItems != null
+					&& this.localDescriptorItems.containsKey(recipientTableKey)) {
+				PSTDescriptorItem item = this.localDescriptorItems
+						.get(recipientTableKey);
 				HashMap<Integer, PSTDescriptorItem> descriptorItems = null;
 				if (item.subNodeOffsetIndexIdentifier > 0) {
-					descriptorItems =pstFile.getPSTDescriptorItems(item.subNodeOffsetIndexIdentifier);
+					descriptorItems = pstFile
+							.getPSTDescriptorItems(item.subNodeOffsetIndexIdentifier);
 				}
-				recipientTable = new PSTTable7C(new PSTNodeInputStream(pstFile, item), descriptorItems);
+				recipientTable = new PSTTable7C(new PSTNodeInputStream(pstFile,
+						item), descriptorItems);
 			}
-		} catch ( Exception e ) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			recipientTable = null;
 		}
 	}
-	
+
 	/**
 	 * get the number of recipients for this message
-	 * @throws PSTException file error
-	 * @throws IOException read error
-	 * @return int	
+	 * 
+	 * @throws PSTException
+	 *             file error
+	 * @throws IOException
+	 *             read error
+	 * @return int
 	 */
-	public int getNumberOfRecipients()
-		throws PSTException, IOException
-	{
+	public int getNumberOfRecipients() throws PSTException, IOException {
 		this.processRecipients();
 
 		// still nothing? must be no recipients...
-		if ( this.recipientTable == null ) {
+		if (this.recipientTable == null) {
 			return 0;
 		}
 		return this.recipientTable.getRowCount();
 	}
-	
+
 	/**
 	 * attachment stuff here, not sure if these can just exist in emails or not,
-	 * but a table key of 0x0671 would suggest that this is a property of the envelope
-	 * rather than a specific email property
+	 * but a table key of 0x0671 would suggest that this is a property of the
+	 * envelope rather than a specific email property
 	 */
-	
+
 	private PSTTable7C attachmentTable = null;
 
 	/**
-	 * find, extract and load up all of the attachments in this email
-	 * necessary for the other operations.
-	 * @throws PSTException 
+	 * find, extract and load up all of the attachments in this email necessary
+	 * for the other operations.
+	 * 
+	 * @throws PSTException
 	 * @throws IOException
 	 */
-	private void processAttachments()
-		throws PSTException, IOException
-	{
+	private void processAttachments() throws PSTException, IOException {
 		int attachmentTableKey = 0x0671;
-		if (this.attachmentTable == null &&
-			this.localDescriptorItems != null &&
-			this.localDescriptorItems.containsKey(attachmentTableKey))
-		{
-			PSTDescriptorItem item = this.localDescriptorItems.get(attachmentTableKey);
+		if (this.attachmentTable == null && this.localDescriptorItems != null
+				&& this.localDescriptorItems.containsKey(attachmentTableKey)) {
+			PSTDescriptorItem item = this.localDescriptorItems
+					.get(attachmentTableKey);
 			HashMap<Integer, PSTDescriptorItem> descriptorItems = null;
 			if (item.subNodeOffsetIndexIdentifier > 0) {
-				descriptorItems =pstFile.getPSTDescriptorItems(item.subNodeOffsetIndexIdentifier);
+				descriptorItems = pstFile
+						.getPSTDescriptorItems(item.subNodeOffsetIndexIdentifier);
 			}
-			attachmentTable = new PSTTable7C(new PSTNodeInputStream(pstFile, item), descriptorItems);
+			attachmentTable = new PSTTable7C(new PSTNodeInputStream(pstFile,
+					item), descriptorItems);
 		}
 	}
 
 	/**
 	 * Start date Filetime
+	 * 
 	 * @return Date
 	 */
 	public Date getTaskStartDate() {
-		return getDateItem(pstFile.getNameToIdMapItem(0x00008104, PSTFile.PSETID_Task));
+		return getDateItem(pstFile.getNameToIdMapItem(0x00008104,
+				PSTFile.PSETID_Task));
 	}
+
 	/**
 	 * Due date Filetime
+	 * 
 	 * @return Date
 	 */
 	public Date getTaskDueDate() {
-		return getDateItem(pstFile.getNameToIdMapItem(0x00008105, PSTFile.PSETID_Task));
+		return getDateItem(pstFile.getNameToIdMapItem(0x00008105,
+				PSTFile.PSETID_Task));
 	}
-	
+
 	/**
 	 * Is a reminder set on this object?
+	 * 
 	 * @return boolean
 	 */
 	public boolean getReminderSet() {
-		return getBooleanItem(pstFile.getNameToIdMapItem(0x00008503, PSTFile.PSETID_Common));
+		return getBooleanItem(pstFile.getNameToIdMapItem(0x00008503,
+				PSTFile.PSETID_Common));
 	}
-	
+
 	public int getReminderDelta() {
-		return getIntItem(pstFile.getNameToIdMapItem(0x00008501, PSTFile.PSETID_Common));
+		return getIntItem(pstFile.getNameToIdMapItem(0x00008501,
+				PSTFile.PSETID_Common));
 	}
-	
+
 	/**
-	 * "flagged" items are actually emails with a due date.
-	 * This convience method just checks to see if that is true.
+	 * "flagged" items are actually emails with a due date. This convience
+	 * method just checks to see if that is true.
+	 * 
 	 * @return boolean
 	 */
 	public boolean isFlagged() {
@@ -925,12 +1068,12 @@ public class PSTMessage extends PSTObject {
 
 	/**
 	 * get the categories defined for this message
+	 * 
 	 * @return String[]
-	 * @throws PSTException file error
+	 * @throws PSTException
+	 *             file error
 	 */
-	public String[] getColorCategories()
-			throws PSTException
-	{
+	public String[] getColorCategories() throws PSTException {
 		int keywordCategory = pstFile.getPublicStringToIdMapItem("Keywords");
 
 		String[] categories = new String[0];
@@ -945,24 +1088,26 @@ public class PSTMessage extends PSTObject {
 					categories = new String[categoryCount];
 					int[] offsets = new int[categoryCount];
 					for (int x = 0; x < categoryCount; x++) {
-						offsets[x] = (int)PSTObject.convertBigEndianBytesToLong(item.data, (x*4)+1, (x+1)*4+1);
+						offsets[x] = (int) PSTObject
+								.convertBigEndianBytesToLong(item.data,
+										(x * 4) + 1, (x + 1) * 4 + 1);
 					}
-					for (int x = 0; x < offsets.length -1; x++) {
+					for (int x = 0; x < offsets.length - 1; x++) {
 						int start = offsets[x];
-						int end = offsets[x+1];
-						int length = (end-start);
+						int end = offsets[x + 1];
+						int length = (end - start);
 						byte[] string = new byte[length];
 						System.arraycopy(item.data, start, string, 0, length);
 						String name = new String(string, "UTF-16LE");
 						categories[x] = name;
 					}
-					int start = offsets[offsets.length-1];
+					int start = offsets[offsets.length - 1];
 					int end = item.data.length;
-					int length = (end-start);
+					int length = (end - start);
 					byte[] string = new byte[length];
 					System.arraycopy(item.data, start, string, 0, length);
 					String name = new String(string, "UTF-16LE");
-					categories[categories.length-1] = name;
+					categories[categories.length - 1] = name;
 				}
 			} catch (Exception err) {
 				throw new PSTException("Unable to decode category data", err);
@@ -970,13 +1115,13 @@ public class PSTMessage extends PSTObject {
 		}
 		return categories;
 	}
-	
+
 	/**
 	 * get the number of attachments for this message
+	 * 
 	 * @return int
 	 */
-	public int getNumberOfAttachments()
-	{
+	public int getNumberOfAttachments() {
 		try {
 			this.processAttachments();
 		} catch (Exception e) {
@@ -984,80 +1129,100 @@ public class PSTMessage extends PSTObject {
 			return 0;
 		}
 
-
 		// still nothing? must be no attachments...
-		if ( this.attachmentTable == null ) {
+		if (this.attachmentTable == null) {
 			return 0;
 		}
 		return this.attachmentTable.getRowCount();
 	}
-	
+
 	/**
 	 * get a specific attachment from this email.
-	 * @param attachmentNumber attachment index
+	 * 
+	 * @param attachmentNumber
+	 *            attachment index
 	 * @return the attachment at the defined index
-	 * @throws PSTException file error
-	 * @throws IOException read error
+	 * @throws PSTException
+	 *             file error
+	 * @throws IOException
+	 *             read error
 	 */
 	public PSTAttachment getAttachment(int attachmentNumber)
-		throws PSTException, IOException
-	{
+			throws PSTException, IOException {
 		this.processAttachments();
-		
+
 		int attachmentCount = 0;
-		if ( this.attachmentTable != null ) {
+		if (this.attachmentTable != null) {
 			attachmentCount = this.attachmentTable.getRowCount();
 		}
-		
+
 		if (attachmentNumber >= attachmentCount) {
-			throw new PSTException("unable to fetch attachment number "+attachmentNumber+", only "+attachmentCount+" in this email");
+			throw new PSTException("unable to fetch attachment number "
+					+ attachmentNumber + ", only " + attachmentCount
+					+ " in this email");
 		}
-		
-		// we process the C7 table here, basically we just want the attachment local descriptor...
-		HashMap<Integer, PSTTable7CItem> attachmentDetails = this.attachmentTable.getItems().get(attachmentNumber);
+
+		// we process the C7 table here, basically we just want the attachment
+		// local descriptor...
+		HashMap<Integer, PSTTable7CItem> attachmentDetails = this.attachmentTable
+				.getItems().get(attachmentNumber);
 		PSTTable7CItem attachmentTableItem = attachmentDetails.get(0x67f2);
 		int descriptorItemId = attachmentTableItem.entryValueReference;
 
 		// get the local descriptor for the attachmentDetails table.
-		PSTDescriptorItem descriptorItem = this.localDescriptorItems.get(descriptorItemId);
+		PSTDescriptorItem descriptorItem = this.localDescriptorItems
+				.get(descriptorItemId);
 
 		// try and decode it
 		byte[] attachmentData = descriptorItem.getData();
-		if ( attachmentData != null && attachmentData.length > 0 ) {
-			//PSTTableBC attachmentDetailsTable = new PSTTableBC(descriptorItem.getData(), descriptorItem.getBlockOffsets());
-			PSTTableBC attachmentDetailsTable = new PSTTableBC(new PSTNodeInputStream(pstFile, descriptorItem));
+		if (attachmentData != null && attachmentData.length > 0) {
+			// PSTTableBC attachmentDetailsTable = new
+			// PSTTableBC(descriptorItem.getData(),
+			// descriptorItem.getBlockOffsets());
+			PSTTableBC attachmentDetailsTable = new PSTTableBC(
+					new PSTNodeInputStream(pstFile, descriptorItem));
 
 			// create our all-precious attachment object.
-			// note that all the information that was in the c7 table is repeated in the eb table in attachment data.
+			// note that all the information that was in the c7 table is
+			// repeated in the eb table in attachment data.
 			// so no need to pass it...
 			HashMap<Integer, PSTDescriptorItem> attachmentDescriptorItems = new HashMap<Integer, PSTDescriptorItem>();
 			if (descriptorItem.subNodeOffsetIndexIdentifier > 0) {
-				attachmentDescriptorItems = pstFile.getPSTDescriptorItems(descriptorItem.subNodeOffsetIndexIdentifier);
+				attachmentDescriptorItems = pstFile
+						.getPSTDescriptorItems(descriptorItem.subNodeOffsetIndexIdentifier);
 			}
-			return new PSTAttachment(this.pstFile, attachmentDetailsTable, attachmentDescriptorItems);
+			return new PSTAttachment(this.pstFile, attachmentDetailsTable,
+					attachmentDescriptorItems);
 		}
 
-		throw new PSTException("unable to fetch attachment number "+attachmentNumber+", unable to read attachment details table");
+		throw new PSTException("unable to fetch attachment number "
+				+ attachmentNumber
+				+ ", unable to read attachment details table");
 	}
-	
+
 	/**
 	 * get a specific recipient from this email.
-	 * @param recipientNumber recipient index
+	 * 
+	 * @param recipientNumber
+	 *            recipient index
 	 * @return the recipient at the defined index
-	 * @throws PSTException file error
-	 * @throws IOException read error
+	 * @throws PSTException
+	 *             file error
+	 * @throws IOException
+	 *             read error
 	 */
-	public PSTRecipient getRecipient(int recipientNumber)
-		throws PSTException, IOException
-	{
-		if ( recipientNumber >= getNumberOfRecipients() || recipientNumber >= recipientTable.getItems().size() )
-		{
-			throw new PSTException("unable to fetch recipient number "+recipientNumber);
+	public PSTRecipient getRecipient(int recipientNumber) throws PSTException,
+			IOException {
+		if (recipientNumber >= getNumberOfRecipients()
+				|| recipientNumber >= recipientTable.getItems().size()) {
+			throw new PSTException("unable to fetch recipient number "
+					+ recipientNumber);
 		}
 
-		HashMap<Integer, PSTTable7CItem> recipientDetails = recipientTable.getItems().get(recipientNumber);
-		
-		if ( recipientDetails != null ) {
+		HashMap<Integer, PSTTable7CItem> recipientDetails = recipientTable
+				.getItems().get(recipientNumber);
+
+		if (recipientDetails != null) {
 			return new PSTRecipient(recipientDetails);
 		}
 
@@ -1065,10 +1230,10 @@ public class PSTMessage extends PSTObject {
 	}
 
 	public String getRecipientsString() {
-		if ( recipientTable != null ) {
+		if (recipientTable != null) {
 			return recipientTable.getItemsString();
 		}
-		
+
 		return "No recipients table!";
 	}
 
@@ -1086,16 +1251,15 @@ public class PSTMessage extends PSTObject {
 
 	/**
 	 * string representation of this email
+	 * 
 	 * @return String
 	 */
 	public String toString() {
-		return
-			"PSTEmail: "+this.getSubject()+"\n"+
-			"Importance: "+this.getImportance()+"\n"+
-			"Message Class: "+this.getMessageClass() + "\n\n" +
-			this.getTransportMessageHeaders()+"\n\n\n"+
-			this.items+
-			this.localDescriptorItems;
+		return "PSTEmail: " + this.getSubject() + "\n" + "Importance: "
+				+ this.getImportance() + "\n" + "Message Class: "
+				+ this.getMessageClass() + "\n\n"
+				+ this.getTransportMessageHeaders() + "\n\n\n" + this.items
+				+ this.localDescriptorItems;
 	}
-	
+
 }

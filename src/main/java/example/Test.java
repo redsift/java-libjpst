@@ -1,4 +1,5 @@
 package example;
+
 import java.util.Vector;
 
 import com.pff.PSTException;
@@ -7,8 +8,7 @@ import com.pff.PSTFolder;
 import com.pff.PSTMessage;
 
 public class Test {
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		new Test(args[0]);
 	}
 
@@ -23,9 +23,9 @@ public class Test {
 	}
 
 	int depth = -1;
-	public void processFolder(PSTFolder folder)
-			throws PSTException, java.io.IOException
-	{
+
+	public void processFolder(PSTFolder folder) throws PSTException,
+			java.io.IOException {
 		depth++;
 		// the root folder doesn't have a display name
 		if (depth > 0) {
@@ -44,11 +44,12 @@ public class Test {
 		// and now the emails for this folder
 		if (folder.getContentCount() > 0) {
 			depth++;
-			PSTMessage email = (PSTMessage)folder.getNextChild();
+			PSTMessage email = (PSTMessage) folder.getNextChild();
 			while (email != null) {
 				printDepth();
-				System.out.println("Email: "+ email.getDescriptorNodeId() + " - " + email.getSubject());
-				email = (PSTMessage)folder.getNextChild();
+				System.out.println("Email: " + email.getDescriptorNodeId()
+						+ " - " + email.getSubject());
+				email = (PSTMessage) folder.getNextChild();
 			}
 			depth--;
 		}
@@ -56,7 +57,7 @@ public class Test {
 	}
 
 	public void printDepth() {
-		for (int x = 0; x < depth-1; x++) {
+		for (int x = 0; x < depth - 1; x++) {
 			System.out.print(" | ");
 		}
 		System.out.print(" |- ");

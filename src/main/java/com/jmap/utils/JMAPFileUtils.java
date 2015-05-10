@@ -6,8 +6,14 @@ import java.security.MessageDigest;
 
 import org.apache.commons.io.FileUtils;
 
+/**
+ * 
+ * @author randalpinto
+ *
+ */
 public class JMAPFileUtils {
-	public static String saveAttachment(String mid, int aid, InputStream fis, String outputDirectory) {
+	public static String saveAttachment(String mid, int aid, InputStream fis,
+			String outputDirectory) {
 		String rPath = null;
 		try {
 			String hash = sha256(mid);

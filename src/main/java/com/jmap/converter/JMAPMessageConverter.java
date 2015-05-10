@@ -14,13 +14,21 @@ import com.pff.PSTAttachment;
 import com.pff.PSTMessage;
 import com.pff.PSTRecipient;
 
+/**
+ * 
+ * @author randalpinto
+ *
+ */
 public class JMAPMessageConverter {
-			
-	public static JMAPMessage getJMAPMessageWithoutAttachments(String mailboxName, PSTMessage pstMsg, List<String> folderPath) {
-		return getJMAPMessageWithAttachments(mailboxName, pstMsg, folderPath, null);
+
+	public static JMAPMessage getJMAPMessageWithoutAttachments(
+			String mailboxName, PSTMessage pstMsg, List<String> folderPath) {
+		return getJMAPMessageWithAttachments(mailboxName, pstMsg, folderPath,
+				null);
 	}
-	
-	public static JMAPMessage getJMAPMessageWithAttachments(String mailboxName, PSTMessage pstMsg, List<String> folderPath, String outputDirectory) {
+
+	public static JMAPMessage getJMAPMessageWithAttachments(String mailboxName,
+			PSTMessage pstMsg, List<String> folderPath, String outputDirectory) {
 		return JMAPMessage
 				.builder()
 				.id(pstMsg.getInternetMessageId())
@@ -41,17 +49,15 @@ public class JMAPMessageConverter {
 				.subject(pstMsg.getSubject())
 				.date(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 						.format(pstMsg.getMessageDeliveryTime()))
-				.size(pstMsg.getMessageSize()).textBody(pstMsg.getBody())
+				.size(pstMsg.getMessageSize())
+				.textBody(pstMsg.getBody())
 				.htmlBody(pstMsg.getBodyHTML())
 				.attachments(getJMAPAttachmentList(pstMsg, outputDirectory))
-				.extensions(JMAPMessageExtensions
-						.builder()
-						.folder(folderPath)
-						.build())
-				.build();
+				.extensions(
+						JMAPMessageExtensions.builder().folder(folderPath)
+								.build()).build();
 	}
 
-	
 	private static List<JMAPEmailer> getJMAPEmailerList(PSTMessage msg, int type) {
 		ArrayList<JMAPEmailer> emailers = null;
 		try {
@@ -72,28 +78,34 @@ public class JMAPMessageConverter {
 		}
 		return emailers;
 	}
-	
-	private static List<JMAPAttachment> getJMAPAttachmentList(PSTMessage msg, String outputDirectory) {
+
+	private static List<JMAPAttachment> getJMAPAttachmentList(PSTMessage msg,
+			String outputDirectory) {
 		ArrayList<JMAPAttachment> attachments = null;
-		if(outputDirectory != null) {
+		if (outputDirectory != null) {
 			try {
 				for (int i = 0; i < msg.getNumberOfAttachments(); i++) {
 					PSTAttachment pa = msg.getAttachment(i);
 					if (attachments == null) {
 						attachments = new ArrayList<JMAPAttachment>();
 					}
-					attachments.add(JMAPAttachment
-							.builder()
-							.id(new Integer(pa.getAttachNum()).toString())
-							.url(JMAPFileUtils.saveAttachment(msg.getInternetMessageId(),
-									pa.getAttachNum(), pa.getFileInputStream(), outputDirectory))
-							.type(pa.getMimeTag())
-							.name(pa.getDisplayName())
-							.size(pa.getAttachSize())
-							.isInline(
-									!pa.isAttachmentInvisibleInHtml()
-											|| !pa.isAttachmentInvisibleInRTF())
-							.build());
+					attachments
+							.add(JMAPAttachment
+									.builder()
+									.id(new Integer(pa.getAttachNum())
+											.toString())
+									.url(JMAPFileUtils.saveAttachment(
+											msg.getInternetMessageId(),
+											pa.getAttachNum(),
+											pa.getFileInputStream(),
+											outputDirectory))
+									.type(pa.getMimeTag())
+									.name(pa.getDisplayName())
+									.size(pa.getAttachSize())
+									.isInline(
+											!pa.isAttachmentInvisibleInHtml()
+													|| !pa.isAttachmentInvisibleInRTF())
+									.build());
 				}
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);

@@ -493,6 +493,7 @@ public class PSTFile {
 	/**
 	 * get the message store of the PST file. Note that this doesn't really have
 	 * much information, better to look under the root folder
+	 * 
 	 * @return PSTMessageStore
 	 * @throws PSTException
 	 *             file error

@@ -45,10 +45,14 @@ import java.util.HashMap;
 public class PSTContact extends PSTMessage {
 
 	/**
-	 * @param theFile the PSTFile
-	 * @param descriptorIndexNode the descriptor index
-	 * @throws PSTException file error
-	 * @throws IOException read error
+	 * @param theFile
+	 *            the PSTFile
+	 * @param descriptorIndexNode
+	 *            the descriptor index
+	 * @throws PSTException
+	 *             file error
+	 * @throws IOException
+	 *             read error
 	 */
 	public PSTContact(PSTFile theFile, DescriptorIndexNode descriptorIndexNode)
 			throws PSTException, IOException {
@@ -56,10 +60,14 @@ public class PSTContact extends PSTMessage {
 	}
 
 	/**
-	 * @param theFile the PSTFile
-	 * @param folderIndexNode the folder index
-	 * @param table the table
-	 * @param localDescriptorItems the descriptor Map
+	 * @param theFile
+	 *            the PSTFile
+	 * @param folderIndexNode
+	 *            the folder index
+	 * @param table
+	 *            the table
+	 * @param localDescriptorItems
+	 *            the descriptor Map
 	 */
 	public PSTContact(PSTFile theFile, DescriptorIndexNode folderIndexNode,
 			PSTTableBC table,

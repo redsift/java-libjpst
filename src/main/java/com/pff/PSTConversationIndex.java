@@ -32,7 +32,8 @@ public class PSTConversationIndex {
 	}
 
 	public String toString() {
-		return guid + "@" + deliveryTime + " " + responseLevels.size() + " ResponseLevels";
+		return guid + "@" + deliveryTime + " " + responseLevels.size()
+				+ " ResponseLevels";
 	}
 
 	public class ResponseLevel {
@@ -64,35 +65,46 @@ public class PSTConversationIndex {
 	}
 
 	protected PSTConversationIndex(byte[] rawConversationIndex) {
-		if (rawConversationIndex != null && rawConversationIndex.length >= MINIMUM_HEADER_SIZE) {
+		if (rawConversationIndex != null
+				&& rawConversationIndex.length >= MINIMUM_HEADER_SIZE) {
 			decodeHeader(rawConversationIndex);
-			if (rawConversationIndex.length >= MINIMUM_HEADER_SIZE + RESPONSE_LEVEL_SIZE) {
+			if (rawConversationIndex.length >= MINIMUM_HEADER_SIZE
+					+ RESPONSE_LEVEL_SIZE) {
 				decodeResponseLevel(rawConversationIndex);
 			}
 		}
 	}
 
 	private void decodeHeader(byte[] rawConversationIndex) {
-		// According to the Spec the first byte is not included, but I believe the spec is incorrect!
-		//int reservedheaderMarker = (int) PSTObject.convertBigEndianBytesToLong(rawConversationIndex, 0, 1);
+		// According to the Spec the first byte is not included, but I believe
+		// the spec is incorrect!
+		// int reservedheaderMarker = (int)
+		// PSTObject.convertBigEndianBytesToLong(rawConversationIndex, 0, 1);
 
-		long deliveryTimeHigh = PSTObject.convertBigEndianBytesToLong(rawConversationIndex, 0, 4);
-		long deliveryTimeLow = PSTObject.convertBigEndianBytesToLong(rawConversationIndex, 4, 6) << 16;
-		deliveryTime = PSTObject.filetimeToDate((int) deliveryTimeHigh, (int) deliveryTimeLow);
+		long deliveryTimeHigh = PSTObject.convertBigEndianBytesToLong(
+				rawConversationIndex, 0, 4);
+		long deliveryTimeLow = PSTObject.convertBigEndianBytesToLong(
+				rawConversationIndex, 4, 6) << 16;
+		deliveryTime = PSTObject.filetimeToDate((int) deliveryTimeHigh,
+				(int) deliveryTimeLow);
 
-		long guidHigh = PSTObject.convertBigEndianBytesToLong(rawConversationIndex, 6, 14);
-		long guidLow = PSTObject.convertBigEndianBytesToLong(rawConversationIndex, 14, 22);
+		long guidHigh = PSTObject.convertBigEndianBytesToLong(
+				rawConversationIndex, 6, 14);
+		long guidLow = PSTObject.convertBigEndianBytesToLong(
+				rawConversationIndex, 14, 22);
 
 		guid = new UUID(guidHigh, guidLow);
 	}
 
 	private void decodeResponseLevel(byte[] rawConversationIndex) {
-		int responseLevelCount = (rawConversationIndex.length - MINIMUM_HEADER_SIZE) / RESPONSE_LEVEL_SIZE;
+		int responseLevelCount = (rawConversationIndex.length - MINIMUM_HEADER_SIZE)
+				/ RESPONSE_LEVEL_SIZE;
 		responseLevels = new ArrayList<ResponseLevel>(responseLevelCount);
 
 		for (int responseLevelIndex = 0, position = 22; responseLevelIndex < responseLevelCount; responseLevelIndex++, position += RESPONSE_LEVEL_SIZE) {
 
-			long responseLevelValue = PSTObject.convertBigEndianBytesToLong(rawConversationIndex, position, position + 5);
+			long responseLevelValue = PSTObject.convertBigEndianBytesToLong(
+					rawConversationIndex, position, position + 5);
 			short deltaCode = (short) (responseLevelValue >> 39);
 			short random = (short) (responseLevelValue & 0xFF);
 
@@ -107,7 +119,8 @@ public class PSTConversationIndex {
 
 			deltaTime /= HUNDRED_NS_TO_MS;
 
-			responseLevels.add(responseLevelIndex, new ResponseLevel(deltaCode, deltaTime, random));
+			responseLevels.add(responseLevelIndex, new ResponseLevel(deltaCode,
+					deltaTime, random));
 		}
 	}
 }

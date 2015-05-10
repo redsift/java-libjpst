@@ -33,20 +33,23 @@
  */
 package com.pff;
 
-import java.io.*;
-import java.util.*;
-
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Class containing attachment information
+ * 
  * @author Richard Johnson
  */
 public class PSTAttachment extends PSTObject {
-	
-	PSTAttachment(PSTFile theFile, PSTTableBC table, HashMap<Integer, PSTDescriptorItem> localDescriptorItems) {
+
+	PSTAttachment(PSTFile theFile, PSTTableBC table,
+			HashMap<Integer, PSTDescriptorItem> localDescriptorItems) {
 		super(theFile, null, table, localDescriptorItems);
 	}
-	
+
 	public int getSize() {
 		return this.getIntItem(0x0e20);
 	}
@@ -58,96 +61,95 @@ public class PSTAttachment extends PSTObject {
 	public Date getModificationTime() {
 		return this.getDateItem(0x3008);
 	}
-	
-	public PSTMessage getEmbeddedPSTMessage()
-			throws IOException, PSTException
-	{
+
+	public PSTMessage getEmbeddedPSTMessage() throws IOException, PSTException {
 		PSTNodeInputStream in = null;
-		if ( getIntItem(0x3705) == PSTAttachment.ATTACHMENT_METHOD_EMBEDDED ) {
+		if (getIntItem(0x3705) == PSTAttachment.ATTACHMENT_METHOD_EMBEDDED) {
 			PSTTableBCItem item = items.get(0x3701);
-			if ( item.entryValueType == 0x0102 ) {
-				if ( !item.isExternalValueReference )
-				{
+			if (item.entryValueType == 0x0102) {
+				if (!item.isExternalValueReference) {
 					in = new PSTNodeInputStream(this.pstFile, item.data);
 				} else {
 					// We are in trouble!
-					throw new PSTException("External reference in getEmbeddedPSTMessage()!\n");
+					throw new PSTException(
+							"External reference in getEmbeddedPSTMessage()!\n");
 				}
-			} else if ( item.entryValueType == 0x000D ) {
-				int descriptorItem = (int)PSTObject.convertLittleEndianBytesToLong(item.data, 0, 4);
-				//PSTObject.printHexFormatted(item.data, true);
-				PSTDescriptorItem descriptorItemNested = this.localDescriptorItems.get(descriptorItem);
+			} else if (item.entryValueType == 0x000D) {
+				int descriptorItem = (int) PSTObject
+						.convertLittleEndianBytesToLong(item.data, 0, 4);
+				// PSTObject.printHexFormatted(item.data, true);
+				PSTDescriptorItem descriptorItemNested = this.localDescriptorItems
+						.get(descriptorItem);
 				in = new PSTNodeInputStream(this.pstFile, descriptorItemNested);
-				this.localDescriptorItems.putAll(pstFile.getPSTDescriptorItems(descriptorItemNested.subNodeOffsetIndexIdentifier));
+				this.localDescriptorItems
+						.putAll(pstFile
+								.getPSTDescriptorItems(descriptorItemNested.subNodeOffsetIndexIdentifier));
 				/*
-				if ( descriptorItemNested != null ) {
-					try {
-						data = descriptorItemNested.getData();
-						blockOffsets = descriptorItemNested.getBlockOffsets();
-					} catch (Exception e) {
-						e.printStackTrace();
-
-						data = null;
-						blockOffsets = null;
-					}
-				}
-				 *
+				 * if ( descriptorItemNested != null ) { try { data =
+				 * descriptorItemNested.getData(); blockOffsets =
+				 * descriptorItemNested.getBlockOffsets(); } catch (Exception e)
+				 * { e.printStackTrace();
+				 * 
+				 * data = null; blockOffsets = null; } }
 				 */
 			}
-			
-			if ( in == null ) {
+
+			if (in == null) {
 				return null;
 			}
 
 			try {
 				PSTTableBC attachmentTable = new PSTTableBC(in);
-				return PSTObject.createAppropriatePSTMessageObject(pstFile, this.descriptorIndexNode, attachmentTable, localDescriptorItems);
-			} catch ( PSTException e ) {
+				return PSTObject.createAppropriatePSTMessageObject(pstFile,
+						this.descriptorIndexNode, attachmentTable,
+						localDescriptorItems);
+			} catch (PSTException e) {
 				e.printStackTrace();
 			}
 			return null;
 		}
 		return null;
 	}
-	
-	public InputStream getFileInputStream()
-		throws IOException, PSTException
-	{
-		
+
+	public InputStream getFileInputStream() throws IOException, PSTException {
+
 		PSTTableBCItem attachmentDataObject = items.get(0x3701);
 
 		if (attachmentDataObject.isExternalValueReference) {
-			PSTDescriptorItem descriptorItemNested = this.localDescriptorItems.get(attachmentDataObject.entryValueReference);
+			PSTDescriptorItem descriptorItemNested = this.localDescriptorItems
+					.get(attachmentDataObject.entryValueReference);
 			return new PSTNodeInputStream(this.pstFile, descriptorItemNested);
 		} else {
 			// internal value references are never encrypted
-			return new PSTNodeInputStream(this.pstFile, attachmentDataObject.data, false);
+			return new PSTNodeInputStream(this.pstFile,
+					attachmentDataObject.data, false);
 		}
 
 	}
-	
-	public int getFilesize()
-		throws PSTException, IOException
-	{
+
+	public int getFilesize() throws PSTException, IOException {
 		PSTTableBCItem attachmentDataObject = items.get(0x3701);
 		if (attachmentDataObject.isExternalValueReference) {
-			PSTDescriptorItem descriptorItemNested = this.localDescriptorItems.get(attachmentDataObject.entryValueReference);
+			PSTDescriptorItem descriptorItemNested = this.localDescriptorItems
+					.get(attachmentDataObject.entryValueReference);
 			if (descriptorItemNested == null) {
-				throw new PSTException("missing attachment descriptor item for: "+attachmentDataObject.entryValueReference);
+				throw new PSTException(
+						"missing attachment descriptor item for: "
+								+ attachmentDataObject.entryValueReference);
 			}
 			return descriptorItemNested.getDataSize();
 		} else {
 			// raw attachment data, right there!
 			return attachmentDataObject.data.length;
 		}
-		
+
 	}
 
-	
 	// attachment properties
-	
+
 	/**
 	 * Attachment (short) filename ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
 	public String getFilename() {
@@ -163,63 +165,82 @@ public class PSTAttachment extends PSTObject {
 	public static final int ATTACHMENT_METHOD_OLE = 6;
 
 	/**
-	 * Attachment method Integer 32-bit signed 0 == None (No attachment) 1 == By value 2 == By reference 3 == By reference resolve 4 == By reference only 5 == Embedded message 6 == OLE
+	 * Attachment method Integer 32-bit signed 0 == None (No attachment) 1 == By
+	 * value 2 == By reference 3 == By reference resolve 4 == By reference only
+	 * 5 == Embedded message 6 == OLE
+	 * 
 	 * @return int
 	 */
 	public int getAttachMethod() {
 		return this.getIntItem(0x3705);
 	}
+
 	/**
 	 * Attachment size
+	 * 
 	 * @return int
 	 */
 	public int getAttachSize() {
 		return this.getIntItem(0x0e20);
 	}
+
 	/**
 	 * Attachment number
+	 * 
 	 * @return int
 	 */
 	public int getAttachNum() {
 		return this.getIntItem(0x0e21);
 	}
+
 	/**
 	 * Attachment long filename ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
 	public String getLongFilename() {
 		return this.getStringItem(0x3707);
 	}
+
 	/**
 	 * Attachment (short) pathname ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
 	public String getPathname() {
 		return this.getStringItem(0x3708);
 	}
+
 	/**
 	 * Attachment Position Integer 32-bit signed
+	 * 
 	 * @return String
 	 */
 	public int getRenderingPosition() {
 		return this.getIntItem(0x370b);
 	}
+
 	/**
 	 * Attachment long pathname ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
 	public String getLongPathname() {
 		return this.getStringItem(0x370d);
 	}
+
 	/**
 	 * Attachment mime type ASCII or Unicode string
+	 * 
 	 * @return String
 	 */
 	public String getMimeTag() {
 		return this.getStringItem(0x370e);
 	}
+
 	/**
 	 * Attachment mime sequence
+	 * 
 	 * @return int
 	 */
 	public int getMimeSequence() {
@@ -228,6 +249,7 @@ public class PSTAttachment extends PSTObject {
 
 	/**
 	 * Attachment Content ID
+	 * 
 	 * @return String
 	 */
 	public String getContentId() {
@@ -236,22 +258,27 @@ public class PSTAttachment extends PSTObject {
 
 	/**
 	 * Attachment not available in HTML
+	 * 
 	 * @return boolean
 	 */
 	public boolean isAttachmentInvisibleInHtml() {
 		int actionFlag = this.getIntItem(0x3714);
 		return ((actionFlag & 0x1) > 0);
 	}
+
 	/**
 	 * Attachment not available in RTF
+	 * 
 	 * @return boolean
 	 */
 	public boolean isAttachmentInvisibleInRTF() {
 		int actionFlag = this.getIntItem(0x3714);
 		return ((actionFlag & 0x2) > 0);
 	}
+
 	/**
 	 * Attachment is MHTML REF
+	 * 
 	 * @return boolean
 	 */
 	public boolean isAttachmentMhtmlRef() {
@@ -261,10 +288,11 @@ public class PSTAttachment extends PSTObject {
 
 	/**
 	 * Attachment content disposition
+	 * 
 	 * @return String
 	 */
 	public String getAttachmentContentDisposition() {
 		return this.getStringItem(0x3716);
 	}
-	
+
 }

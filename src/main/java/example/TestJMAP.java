@@ -14,6 +14,11 @@ import com.pff.PSTFile;
 import com.pff.PSTFolder;
 import com.pff.PSTMessage;
 
+/**
+ * 
+ * @author randalpinto
+ *
+ */
 public class TestJMAP {
 
 	private final String OUTPUT_DIRECTORY = "output/";
@@ -51,7 +56,7 @@ public class TestJMAP {
 		if (folder.getContentCount() > 0) {
 			PSTMessage email = (PSTMessage) folder.getNextChild();
 			while (email != null) {
-				// System.out.println("Processing: " + email.getSubject());
+				// System.out.println("Processing: " + email.toString());
 				ObjectMapper mapper = new ObjectMapper();
 
 				// TODO: remove indentation from production system

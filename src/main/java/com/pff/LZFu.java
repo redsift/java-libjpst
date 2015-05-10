@@ -38,22 +38,25 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * An implementation of the LZFu algorithm to decompress RTF content
+ * 
  * @author Richard Johnson
  */
 public class LZFu {
 
 	public static final String LZFU_HEADER = "{\\rtf1\\ansi\\mac\\deff0\\deftab720{\\fonttbl;}{\\f0\\fnil \\froman \\fswiss \\fmodern \\fscript \\fdecor MS Sans SerifSymbolArialTimes New RomanCourier{\\colortbl\\red0\\green0\\blue0\n\r\\par \\pard\\plain\\f0\\fs20\\b\\i\\u\\tab\\tx";
 
-	public static String decode(byte[] data)
-			throws PSTException
-	{
+	public static String decode(byte[] data) throws PSTException {
 
 		@SuppressWarnings("unused")
-		int compressedSize = (int)PSTObject.convertLittleEndianBytesToLong(data, 0, 4);
-		int uncompressedSize = (int)PSTObject.convertLittleEndianBytesToLong(data, 4, 8);
-		int compressionSig =  (int)PSTObject.convertLittleEndianBytesToLong(data, 8, 12);
+		int compressedSize = (int) PSTObject.convertLittleEndianBytesToLong(
+				data, 0, 4);
+		int uncompressedSize = (int) PSTObject.convertLittleEndianBytesToLong(
+				data, 4, 8);
+		int compressionSig = (int) PSTObject.convertLittleEndianBytesToLong(
+				data, 8, 12);
 		@SuppressWarnings("unused")
-		int compressedCRC =  (int)PSTObject.convertLittleEndianBytesToLong(data, 12, 16);
+		int compressedCRC = (int) PSTObject.convertLittleEndianBytesToLong(
+				data, 12, 16);
 
 		if (compressionSig == 0x75465a4c) {
 			// we are compressed...
@@ -71,7 +74,8 @@ public class LZFu {
 			int currentDataPosition = 16;
 
 			// next byte is the flags,
-			while (currentDataPosition < data.length - 2 && outputPosition < output.length) {
+			while (currentDataPosition < data.length - 2
+					&& outputPosition < output.length) {
 				int flags = data[currentDataPosition++] & 0xFF;
 				for (int x = 0; x < 8 && outputPosition < output.length; x++) {
 					boolean isRef = ((flags & 1) == 1);
@@ -81,13 +85,15 @@ public class LZFu {
 						// length to read
 						int refOffsetOrig = data[currentDataPosition++] & 0xFF;
 						int refSizeOrig = data[currentDataPosition++] & 0xFF;
-						int refOffset = (refOffsetOrig << 4) | (refSizeOrig >>> 4);
+						int refOffset = (refOffsetOrig << 4)
+								| (refSizeOrig >>> 4);
 						int refSize = (refSizeOrig & 0xF) + 2;
-						//refOffset &= 0xFFF;
+						// refOffset &= 0xFFF;
 						try {
 							// copy the data from the buffer
 							int index = refOffset;
-							for (int y = 0; y < refSize && outputPosition < output.length; y++) {
+							for (int y = 0; y < refSize
+									&& outputPosition < output.length; y++) {
 								output[outputPosition++] = lzBuffer[index];
 								lzBuffer[bufferPosition] = lzBuffer[index];
 								bufferPosition++;
@@ -95,13 +101,13 @@ public class LZFu {
 								++index;
 								index %= 4096;
 							}
-						} catch ( Exception e ) {
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 
 					} else {
 						// copy the byte over
-						lzBuffer[bufferPosition] = 	data[currentDataPosition];
+						lzBuffer[bufferPosition] = data[currentDataPosition];
 						bufferPosition++;
 						bufferPosition %= 4096;
 						output[outputPosition++] = data[currentDataPosition++];
@@ -109,16 +115,19 @@ public class LZFu {
 				}
 			}
 
-			if ( outputPosition != uncompressedSize ) {
-				throw new PSTException(String.format("Error decompressing RTF! Expected %d bytes, got %d bytes\n", uncompressedSize, outputPosition));
+			if (outputPosition != uncompressedSize) {
+				throw new PSTException(
+						String.format(
+								"Error decompressing RTF! Expected %d bytes, got %d bytes\n",
+								uncompressedSize, outputPosition));
 			}
 			return new String(output).trim();
 
 		} else if (compressionSig == 0x414c454d) {
 			// we are not compressed!
 			// just return the rest of the contents as a string
-			byte[] output = new byte[data.length-16];
-			System.arraycopy(data, 16, output, 0, data.length-16);
+			byte[] output = new byte[data.length - 16];
+			System.arraycopy(data, 16, output, 0, data.length - 16);
 			return new String(output).trim();
 		}
 

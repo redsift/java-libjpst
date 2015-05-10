@@ -19,16 +19,16 @@
 		</license>
 	</licenses>
 
-	<scm>
-        <connection>scm:https://github.com/Redsift/java-libjpst/tags/java-libjpst-0.8.1</connection>
-        <url>https://github.com/Redsift/java-libjpst/tags/java-libjpst-0.8.1</url>
-    </scm>
-
     <developers>
         <developer>
             <name>Richard Johnson</name>
             <email>@rjohnsondev</email>
             <organization>Skimlinks</organization>
+        </developer>
+        <developer>
+            <name>Randal Pinto</name>
+            <email>@randalpinto</email>
+            <organization>Redsift Limited</organization>
         </developer>
     </developers> 
 
