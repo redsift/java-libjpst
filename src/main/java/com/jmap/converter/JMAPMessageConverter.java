@@ -21,12 +21,14 @@ import com.pff.PSTRecipient;
  */
 public class JMAPMessageConverter {
 
-	public static JMAPMessage getJMAPMessageWithoutAttachments(
+	// Creates a JMAP message without its attachments
+	public static JMAPMessage getJMAPMessage(
 			String mailboxName, PSTMessage pstMsg, List<String> folderPath) {
 		return getJMAPMessageWithAttachments(mailboxName, pstMsg, folderPath,
 				null);
 	}
 
+	// Creates a JMAP message with its attachments
 	public static JMAPMessage getJMAPMessageWithAttachments(String mailboxName,
 			PSTMessage pstMsg, List<String> folderPath, String outputDirectory) {
 		return JMAPMessage
@@ -58,6 +60,7 @@ public class JMAPMessageConverter {
 								.build()).build();
 	}
 
+	// Gets a list of emails and display names.
 	private static List<JMAPEmailer> getJMAPEmailerList(PSTMessage msg, int type) {
 		ArrayList<JMAPEmailer> emailers = null;
 		try {
@@ -79,6 +82,7 @@ public class JMAPMessageConverter {
 		return emailers;
 	}
 
+	// Gets the list of attachments from the message
 	private static List<JMAPAttachment> getJMAPAttachmentList(PSTMessage msg,
 			String outputDirectory) {
 		ArrayList<JMAPAttachment> attachments = null;

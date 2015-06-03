@@ -17,8 +17,10 @@ public class JMAPFileUtils {
 		String rPath = null;
 		try {
 			String hash = sha256(mid);
-			String fPath = outputDirectory + hash + "-att-" + aid;
-			FileUtils.copyInputStreamToFile(fis, new File(fPath));
+			String fPath = outputDirectory + File.separator + hash + "-att-" + aid;
+			File f = new File(fPath);
+			f.getParentFile().mkdirs();
+			FileUtils.copyInputStreamToFile(fis, f);
 			rPath = fPath;
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
